@@ -1,5 +1,5 @@
 httpx==0.24.0
-Pillow
+pillow==10.3.0
 playwright==1.42.0
 tenacity==8.2.2
 PyExecJS==1.5.1
@@ -10,6 +10,13 @@ pydantic==2.5.2
 aiofiles~=23.2.1
 fastapi==0.110.2
 uvicorn==0.29.0
-gradio
-openai
-scikit-learn
+gradio==4.32.2
+openai==1.30.5
+scikit-learn==1.4.2
+jq==1.7.0
+langchain==0.2.1
+langchain-chroma==0.1.1
+langchain-community==0.2.1
+langchain-core==0.2.3
+langchain-openai==0.1.8
+langchain-text-splitters==0.2.0
