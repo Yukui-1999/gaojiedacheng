@@ -16,6 +16,7 @@ from langchain_core.runnables import RunnablePassthrough
 from langchain_openai import OpenAIEmbeddings
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_openai import ChatOpenAI
+from _config_ import _config_
 
 os.environ["LANGCHAIN_TRACING_V2"] = "true"
 os.environ["LANGCHAIN_API_KEY"] = "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"
