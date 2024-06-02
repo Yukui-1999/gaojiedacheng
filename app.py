@@ -41,14 +41,14 @@ def generate_travel_script(destination, days, budget, detail_level, randomness):
     main_py_path = _config_.main_py_path
     if not os.path.isfile(main_py_path):
         raise FileNotFoundError(f"Script not found: {main_py_path}")
-    command = [conda_env_python, main_py_path, '--platform', 'xhs', '--lt', 'cookie', '--type', 'search']
+    command = [conda_env_python, main_py_path, '--platform', 'xhs', '--lt', 'qrcode', '--type', 'search']
     result = subprocess.run(command, capture_output=True, text=True)
     print("标准输出:", result.stdout)
     print("标准错误:", result.stderr)
     print("返回码:", result.returncode)
     
 
-    directory = r"D:\documents\Code\Vscode\Python\xiaohongshupachong\MediaCrawler\data\xhs"  # 替换为你的目录路径
+    directory = _config_.directory
     latest_file = get_latest_file(directory, "json")  # 替换为你的文件扩展名，例如"txt"、"py"等
     if latest_file:
         print("最新的文件是:", latest_file)
