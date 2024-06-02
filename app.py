@@ -7,6 +7,7 @@ import json
 from openai import OpenAI
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
+from _config_ import _config_
 
 def get_latest_file(directory, file_extension="*"):
     # 获取目录下所有文件
@@ -23,7 +24,7 @@ def generate_travel_script(destination, days, budget, detail_level, randomness):
     # Sample script generation logic
     script = f"{destination}旅行，{days}天，{budget}元预算，{detail_level}描述"
 
-    config_file_path = r'D:\documents\Code\Vscode\Python\xiaohongshupachong\MediaCrawler\config\base_config.py'
+    config_file_path = _config_.config_file_path
     new_keyword = script
     with open(config_file_path, 'r', encoding='utf-8') as file:
         config_content = file.read()
@@ -33,11 +34,11 @@ def generate_travel_script(destination, days, budget, detail_level, randomness):
     print("KEYWORDS 已成功更新为:", new_keyword)
     
 
-    conda_env_name = 'gaojiedacheng'
-    conda_env_python = r'C:\Users\Yukui\.conda\envs\gaojiedacheng\python.exe'
+    conda_env_name = _config_.conda_env_name
+    conda_env_python = _config_.conda_env_python
     if not os.path.isfile(conda_env_python):
         raise FileNotFoundError(f"Python interpreter not found: {conda_env_python}")
-    main_py_path = r'D:\documents\Code\Vscode\Python\xiaohongshupachong\MediaCrawler\main.py'  # 替换为你的 main.py 的实际绝对路径
+    main_py_path = _config_.main_py_path
     if not os.path.isfile(main_py_path):
         raise FileNotFoundError(f"Script not found: {main_py_path}")
     command = [conda_env_python, main_py_path, '--platform', 'xhs', '--lt', 'cookie', '--type', 'search']
