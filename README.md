@@ -29,7 +29,7 @@
    ```
 
 ### 运行程序
-
+   打开 `app_langchain.py` 文件，将 `_config_` 中的 `python` 解析器 `conda_env_python` 设置为你的虚拟环境路径
    ```shell
    python app_langchain.py
 
