@@ -41,7 +41,7 @@ def get_latest_file(directory, file_extension="*"):
     return latest_file
 
 
-def generate_travel_script(destination, days, budget, detail_level, randomness):
+def crawl_xhs(destination, days, budget, detail_level):
     # Sample script generation logic
     script = f"{destination}旅行，{days}天，{budget}元预算，{detail_level}描述"
 
@@ -77,10 +77,14 @@ def generate_travel_script(destination, days, budget, detail_level, randomness):
         print("最新的文件是:", latest_file)
     else:
         print("目录中没有找到文件")
+        
+    return latest_file
 
+
+def generate_travel_script(destination, days, budget, detail_level, randomness):
     loader = JSONLoader(
-        file_path=latest_file,
-        # file_path='/data/home/Zhifan/gaojiedacheng/data/xhs/test.json',
+        # file_path=crawl_xhs(destination, days, budget, detail_level),
+        file_path=_config_.dev_json_file,
         jq_schema='.[].desc',
         # content_key='uri'
         text_content=False)
@@ -120,7 +124,7 @@ days_input = gr.Slider(label="天数", minimum=1, maximum=10, step=1, value=2)
 budget_input = gr.Slider(label="预算（元）", minimum=100,
                          maximum=10000, step=100, value=2000)
 detail_level_input = gr.Radio(label="是否生成更详细的旅行攻略", choices=[
-                              "简单", "详细"], value="简单")
+                              "简单", "详细"], value="详细")
 randomness_input = gr.Slider(
     label="生成结果的随机度（越大越随机）", minimum=0, maximum=1, step=0.1, value=0)
 
