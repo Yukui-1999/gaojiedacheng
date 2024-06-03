@@ -24,6 +24,10 @@ os.environ["OPENAI_API_KEY"] = "sk-8F9n3GqEgKlV45Js7fE8Bf3285Bc47A6961035F272F3D
 os.environ["OPENAI_API_BASE"] = "https://api.aiwaves.cn/v1"
 
 
+def format_docs(docs):
+    return "\n\n".join(doc.page_content for doc in docs)
+
+
 def get_latest_file(directory, file_extension="*"):
     # 获取目录下所有文件
     files = glob.glob(os.path.join(directory, f"*.{file_extension}"))
@@ -35,10 +39,6 @@ def get_latest_file(directory, file_extension="*"):
     # 获取最新修改时间的文件
     latest_file = max(files, key=os.path.getmtime)
     return latest_file
-
-
-def format_docs(docs):
-    return "\n\n".join(doc.page_content for doc in docs)
 
 
 def generate_travel_script(destination, days, budget, detail_level, randomness):
