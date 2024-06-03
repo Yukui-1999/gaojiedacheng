@@ -193,7 +193,7 @@ def generate_travel_script(destination, days, budget, detail_level, randomness, 
     global rag_chain
     tmp_state = State(destination, days, budget, detail_level)
     if tmp_state == cur_state and other != '':
-        query = other
+        query = f'{other}，请给我修改后的旅行计划描述脚本'
     else:
         rag_chain = generate_rag_chain(destination, days, budget, detail_level, randomness)
         

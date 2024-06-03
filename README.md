@@ -2,15 +2,18 @@
 ## 使用方法
 
 ### 创建并激活 python 虚拟环境
-```shell   
-   # 进入项目根目录
+
+   进入项目根目录
+   ```shell   
    cd gaojiedacheng
-   
-   # 创建虚拟环境
+   ```
+   创建虚拟环境
+   ```shell
    conda create -n gaojiedacheng python=3.12
-
+   ```
+   进入虚拟环境
+   ```shell
    conda activate gaojiedacheng
-
    ```
 
 ### 安装依赖库
@@ -28,13 +31,12 @@
 ### 运行程序
 
    ```shell
-   
    python app_langchain.py
-  
-   # 打开对应APP扫二维码登录
-     
-   ```
 
+   ```
+   打开网页，点击运行后，扫码登陆小红书帐号启动爬虫
+
+## 爬虫相关
 > **免责声明：**
 > 
 > 大家请以学习为目的使用本仓库，爬虫违法违规的案件：https://github.com/HiddenStrawberry/Crawler_Illegal_Cases_In_China  <br>
