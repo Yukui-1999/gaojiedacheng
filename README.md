@@ -22,7 +22,7 @@
    pip3 install -r requirements.txt
    ```
 
-### 安装 playwright浏览器驱动
+### 安装 playwright 浏览器驱动
 
    ```shell
    playwright install
