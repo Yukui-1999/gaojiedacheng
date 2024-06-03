@@ -84,13 +84,33 @@ def crawl_xhs(destination, days, budget, detail_level):
 # history
 store = {}
 
+class State:
+    def __init__(self, destination="", days=0, budget=0, detail_level="简单"):
+        self.destination = destination
+        self.days = days
+        self.budget = budget
+        self.detail_level = detail_level
+    def __eq__(self, other):
+        # 首先检查 'other' 是否是 TravelPlan 类的一个实例
+        if not isinstance(other, State):
+            # 如果不是，返回 False
+            return NotImplemented
+
+        # 比较所有属性
+        return (self.destination == other.destination and
+                self.days == other.days and
+                self.budget == other.budget and
+                self.detail_level == other.detail_level)
+        
+cur_state = State()
+rag_chain = None
 
 def get_session_history(session_id: str) -> BaseChatMessageHistory:
     if session_id not in store:
         store[session_id] = ChatMessageHistory()
     return store[session_id]
 
-def generate_travel_script(destination, days, budget, detail_level, randomness, other):
+def generate_rag_chain(destination, days, budget, detail_level, randomness):
     llm = ChatOpenAI(
         model="gpt-4-0125-preview",
         openai_api_key=os.getenv("OPENAI_API_KEY"),
@@ -163,27 +183,35 @@ def generate_travel_script(destination, days, budget, detail_level, randomness, 
         output_messages_key="answer",
     )
     
-    # return conversational_rag_chain
+    return conversational_rag_chain
     
+def generate_travel_script(destination, days, budget, detail_level, randomness, other):
+    global cur_state
+    global rag_chain
+    tmp_state = State(destination, days, budget, detail_level)
+    if tmp_state == cur_state and other != '':
+        query = other
+    else:
+        rag_chain = generate_rag_chain(destination, days, budget, detail_level, randomness)
+        
+        # 定义要查询的问题  
+        # query = "请生成一个关于重庆2天2000元预算旅游的简单描述脚本"
+        query = f"请生成一个关于{destination}{days}天{budget}元预算旅游的{detail_level}描述脚本，如果可以的话请同时给出具体开支、游玩时长、移动距离。{other}"
+        cur_state.__dict__ = tmp_state.__dict__.copy()
     
-    # 定义要查询的问题  
-    # query = "请生成一个关于重庆2天2000元预算旅游的简单描述脚本"
-    query = f"请生成一个关于{destination}{days}天{budget}元预算旅游的{detail_level}描述脚本，包括具体开支、游玩时长、移动距离"
     result = ''
-    for s in conversational_rag_chain.stream(
+    for s in rag_chain.stream(
         {"input": query},
-        config={"configurable": {"session_id": "travelplan"}},
+        config={"configurable": {"session_id": "travelplan_lzf"}},
     ):
         if 'answer' in s:   
             result=result+s['answer']
             yield result
 
-    # return conversational_rag_chain.invoke({"input": query},config={"configurable": {"session_id": "abc123"}})["answer"]
-
 
 # Define interface components
 destination_input = gr.Textbox(label="旅行目的地", value="重庆")
-days_input = gr.Slider(label="天数", minimum=1, maximum=10, step=1, value=2)
+days_input = gr.Slider(label="天数", minimum=1, maximum=14, step=1, value=2)
 budget_input = gr.Slider(label="预算（元）", minimum=100,
                          maximum=10000, step=100, value=2000)
 detail_level_input = gr.Radio(label="是否生成更详细的旅行攻略", choices=[
