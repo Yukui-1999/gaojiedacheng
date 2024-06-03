@@ -3,31 +3,27 @@ import re
 import subprocess
 import os
 import glob
-import json
-import time
-from openai import OpenAI
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics.pairwise import cosine_similarity
-from langchain import hub
+import shutil
 from langchain.chains import create_history_aware_retriever, create_retrieval_chain
 from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain_chroma import Chroma
 from langchain_community.chat_message_histories import ChatMessageHistory
 from langchain_community.document_loaders import JSONLoader
 from langchain_core.chat_history import BaseChatMessageHistory
-from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
-from langchain_core.runnables import RunnablePassthrough
 from langchain_core.runnables.history import RunnableWithMessageHistory
 from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from _config_ import _config_
 
 os.environ["LANGCHAIN_TRACING_V2"] = "true"
 os.environ["LANGCHAIN_API_KEY"] = "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"
 os.environ["OPENAI_API_KEY"] = "sk-8F9n3GqEgKlV45Js7fE8Bf3285Bc47A6961035F272F3D256"
 os.environ["OPENAI_API_BASE"] = "https://api.aiwaves.cn/v1"
+
+class _config_:
+    conda_env_name='travelplan'
+    conda_env_python='/home/cmos/anaconda3/envs/travelplan/bin/python'
 
 def get_latest_file(directory, file_extension="*"):
     # 获取目录下所有文件
@@ -46,7 +42,7 @@ def crawl_xhs(destination, days, budget, detail_level):
     # Sample script generation logic
     script = f"{destination}旅行，{days}天，{budget}元预算，{detail_level}描述"
 
-    config_file_path = _config_.config_file_path
+    config_file_path = os.path.join('config', 'base_config.py')
     new_keyword = script
     with open(config_file_path, 'r', encoding='utf-8') as file:
         config_content = file.read()
@@ -61,25 +57,28 @@ def crawl_xhs(destination, days, budget, detail_level):
     if not os.path.isfile(conda_env_python):
         raise FileNotFoundError(
             f"Python interpreter not found: {conda_env_python}")
-    main_py_path = _config_.main_py_path
+    main_py_path = './main.py'
     if not os.path.isfile(main_py_path):
         raise FileNotFoundError(f"Script not found: {main_py_path}")
     command = [conda_env_python, main_py_path, '--platform',
-               'xhs', '--lt', 'cookie', '--type', 'search']
+               'xhs', '--lt', 'qrcode', '--type', 'search']
     result = subprocess.run(command, capture_output=True, text=True)
     print("标准输出:", result.stdout)
     print("标准错误:", result.stderr)
     print("返回码:", result.returncode)
 
-    directory = _config_.directory
+    directory = 'data/xhs'
     latest_file = get_latest_file(
         directory, "json")  # 替换为你的文件扩展名，例如"txt"、"py"等
     if latest_file:
         print("最新的文件是:", latest_file)
     else:
         print("目录中没有找到文件")
+    
+    dst = os.path.join('xhs', f'{destination}_{days}_{budget}.json')
+    shutil.copy(latest_file, dst)
         
-    return latest_file
+    return dst
 
 # history
 store = {}
@@ -118,10 +117,14 @@ def generate_rag_chain(destination, days, budget, detail_level, randomness):
         temperature=randomness
     )
     
+    file_path = os.path.join('xhs', f'{destination}_{days}_{budget}.json')
+    if not os.path.exists(file_path):
+        file_path=crawl_xhs(destination, days, budget, detail_level)
+    
     # retriever
     loader = JSONLoader(
-        # file_path=crawl_xhs(destination, days, budget, detail_level),
-        file_path=_config_.dev_json_file,
+        file_path=file_path,
+        # file_path=os.path.join('xhs', '重庆_2_2000.json'),
         jq_schema='.[].desc',
         # content_key='uri'
         text_content=False)
